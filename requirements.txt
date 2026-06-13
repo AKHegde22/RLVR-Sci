@@ -1,0 +1,9 @@
+torch
+rdkit
+transformers
+trl
+datasets
+scikit-learn
+pandas
+tqdm
+peft
