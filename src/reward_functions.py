@@ -33,12 +33,13 @@ def create_surrogate_reward_func(
 
     def surrogate_reward_func(completions, **kwargs) -> list[float]:
         smiles_list = [extract_smiles_from_completion(c) for c in completions]
-        normalized = verifier.predict_normalized(
-            [s if s is not None else "C" for s in smiles_list]
-        )
-        rewards = []
-        for smiles, score in zip(smiles_list, normalized):
-            rewards.append(float(score) if smiles is not None else 0.0)
+        rewards = [0.0] * len(smiles_list)
+        valid_indices = [i for i, s in enumerate(smiles_list) if s is not None]
+        if valid_indices:
+            valid_smiles = [smiles_list[i] for i in valid_indices]
+            normalized = verifier.predict_normalized(valid_smiles)
+            for idx, score in zip(valid_indices, normalized):
+                rewards[idx] = float(score)
         return rewards
 
     return surrogate_reward_func

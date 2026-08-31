@@ -90,6 +90,7 @@ python -m pytest tests/ -v
 - `src/reward_functions.py`: GRPO reward functions (validity, surrogate, novelty, diversity, conditional).
 - `src/grpo_rlvr.py`: GRPO training setup with eval split and logging.
 - `tests/`: Unit tests for parsing, chemistry, rewards, and surrogate training.
+- `modal_scripts/`: Modal cloud jobs (dataset volume prep, etc.) — separate from `src/`.
 - `main.py`: Orchestrator script.
 
 ## Design Notes

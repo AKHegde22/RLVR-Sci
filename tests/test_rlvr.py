@@ -39,6 +39,9 @@ class SmilesUtilsTests(unittest.TestCase):
     def test_invalid_smiles(self):
         self.assertIsNone(extract_smiles("not a molecule at all"))
 
+    def test_invalid_prose_words(self):
+        self.assertIsNone(extract_smiles("invalid molecule text"))
+
 
 class ChemistryTests(unittest.TestCase):
     def test_tanimoto_identical(self):

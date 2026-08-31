@@ -1,14 +1,13 @@
 import os
-import random
-from typing import Optional
+import inspect
+from typing import Any
 
-import pandas as pd
 import torch
-from datasets import Dataset
 from peft import LoraConfig, get_peft_model, prepare_model_for_kbit_training
 from trl import GRPOConfig, GRPOTrainer
 from transformers import AutoModelForCausalLM, AutoTokenizer
 
+from src.prompt_dataset import prepare_prompts_dataset
 from src.reward_functions import create_reward_functions
 
 MISTRAL_LORA_TARGET_MODULES = [
@@ -21,72 +20,65 @@ MISTRAL_LORA_TARGET_MODULES = [
     "down_proj",
 ]
 
-CONDITIONAL_PROMPT_TEMPLATE = (
-    "Respond with exactly one novel molecule using this format: "
-    "<smiles>YOUR_SMILES_HERE</smiles>. "
-    "Target HOMO-LUMO gap: at least {target_gap:.3f} Hartree. "
-    "Do not include any other text."
-)
-
-UNCONDITIONAL_PROMPTS = [
-    (
-        "Respond with exactly one novel small organic molecule using this format: "
-        "<smiles>YOUR_SMILES_HERE</smiles>. Maximize HOMO-LUMO gap. "
-        "Do not include any other text."
-    ),
-    (
-        "Output a single valid SMILES for a novel molecule with a large HOMO-LUMO gap. "
-        "Format: <smiles>YOUR_SMILES_HERE</smiles> only."
-    ),
-    (
-        "Generate one chemically valid, novel SMILES string wrapped in <smiles></smiles> tags. "
-        "Prefer structures with high HOMO-LUMO gap."
-    ),
-]
+NUM_GENERATIONS = 4
 
 
-def prepare_prompts_dataset(
-    qm9_path: str = "data/qm9_processed.csv",
-    num_prompts: int = 500,
-    eval_fraction: float = 0.1,
-    seed: int = 42,
-) -> tuple[Dataset, Optional[Dataset]]:
-    """
-    Build diverse property-conditioned and unconditional prompts from QM9 gaps.
-    Returns train and eval datasets with optional target_gap for conditional rewards.
-    """
-    rng = random.Random(seed)
-    df = pd.read_csv(qm9_path)
+def _per_device_train_batch_size(num_generations: int = NUM_GENERATIONS) -> int:
+    """TRL requires (per_device_batch * world_size) % num_generations == 0."""
+    world_size = max(1, int(os.environ.get("WORLD_SIZE", "1")))
+    per_device = 1
+    while (per_device * world_size) % num_generations != 0:
+        per_device += 1
+    return per_device
 
-    if len(df) < num_prompts:
-        num_prompts = len(df)
 
-    sampled = df.sample(n=num_prompts, random_state=seed).reset_index(drop=True)
+def _supported_kwargs(cls: type, kwargs: dict[str, Any]) -> dict[str, Any]:
+    """Drop kwargs that the installed TRL class does not accept."""
+    try:
+        params = inspect.signature(cls.__init__).parameters
+    except (TypeError, ValueError):
+        return kwargs
+    return {key: value for key, value in kwargs.items() if key in params}
 
-    prompts: list[list[dict[str, str]]] = []
-    target_gaps: list[float] = []
 
-    for _, row in sampled.iterrows():
-        gap = float(row["gap"])
-        if rng.random() < 0.6:
-            text = CONDITIONAL_PROMPT_TEMPLATE.format(target_gap=gap)
-            target_gaps.append(gap)
-        else:
-            text = rng.choice(UNCONDITIONAL_PROMPTS)
-            target_gaps.append(-1.0)
-
-        prompts.append([{"role": "user", "content": text}])
-
-    dataset = Dataset.from_dict(
-        {
-            "prompt": prompts,
-            "target_gap": target_gaps,
-        }
+def _build_grpo_config(
+    output_dir: str,
+    max_steps: int,
+    seed: int,
+    reward_weights: list[float],
+    per_device_train_batch_size: int,
+) -> GRPOConfig:
+    return GRPOConfig(
+        **_supported_kwargs(
+            GRPOConfig,
+            {
+                "output_dir": output_dir,
+                "learning_rate": 1e-5,
+                "per_device_train_batch_size": per_device_train_batch_size,
+                "per_device_eval_batch_size": per_device_train_batch_size,
+                "gradient_accumulation_steps": 4,
+                "max_prompt_length": 256,
+                "max_completion_length": 128,
+                "num_generations": NUM_GENERATIONS,
+                "max_steps": max_steps,
+                "save_steps": min(100, max_steps),
+                "logging_steps": min(10, max_steps),
+                "eval_strategy": "steps",
+                "eval_steps": min(50, max_steps),
+                "bf16": True,
+                "beta": 0.0,
+                "seed": seed,
+                "data_seed": seed,
+                "reward_weights": reward_weights,
+                "log_completions": True,
+                "num_completions_to_print": 2,
+                "report_to": "none",
+                "gradient_checkpointing": True,
+                # Keep target_gap (and other reward kwargs) from the dataset.
+                "remove_unused_columns": False,
+            },
+        )
     )
-
-    eval_size = max(1, int(len(dataset) * eval_fraction))
-    split = dataset.train_test_split(test_size=eval_size, seed=seed)
-    return split["train"], split["test"]
 
 
 def _build_peft_config() -> LoraConfig:
@@ -154,38 +146,31 @@ def run_grpo_training(
     model = get_peft_model(model, peft_config)
     model.print_trainable_parameters()
 
-    training_args = GRPOConfig(
+    per_device_batch = _per_device_train_batch_size(NUM_GENERATIONS)
+    print(f"GRPO per_device_train_batch_size={per_device_batch} (num_generations={NUM_GENERATIONS})")
+
+    training_args = _build_grpo_config(
         output_dir=output_dir,
-        learning_rate=1e-5,
-        per_device_train_batch_size=1,
-        per_device_eval_batch_size=1,
-        gradient_accumulation_steps=4,
-        max_prompt_length=256,
-        max_completion_length=128,
-        num_generations=4,
         max_steps=max_steps,
-        save_steps=min(100, max_steps),
-        logging_steps=min(10, max_steps),
-        eval_strategy="steps",
-        eval_steps=min(50, max_steps),
-        bf16=True,
-        beta=0.0,
         seed=seed,
-        data_seed=seed,
         reward_weights=reward_weights,
-        log_completions=True,
-        num_completions_to_print=2,
-        report_to="none",
-        gradient_checkpointing=True,
+        per_device_train_batch_size=per_device_batch,
     )
 
     trainer = GRPOTrainer(
-        model=model,
-        reward_funcs=reward_funcs,
-        args=training_args,
-        train_dataset=train_dataset,
-        eval_dataset=eval_dataset,
-        processing_class=tokenizer,
+        **_supported_kwargs(
+            GRPOTrainer,
+            {
+                "model": model,
+                "reward_funcs": reward_funcs,
+                "args": training_args,
+                "train_dataset": train_dataset,
+                "eval_dataset": eval_dataset,
+                "processing_class": tokenizer,
+                "tokenizer": tokenizer,
+                "reward_weights": reward_weights,
+            },
+        )
     )
 
     print("Starting GRPO training...")

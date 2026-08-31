@@ -1,8 +1,9 @@
 """Chemistry helpers: fingerprints and similarity."""
 
 import numpy as np
-from rdkit import Chem
 from rdkit.Chem import AllChem
+
+from src.smiles_utils import mol_from_smiles_quiet, suppress_rdkit_logs
 
 FP_RADIUS = 2
 FP_N_BITS = 2048
@@ -11,12 +12,13 @@ FP_N_BITS = 2048
 def morgan_fingerprint(smiles: str) -> np.ndarray | None:
     """Return Morgan fingerprint bit vector as numpy array, or None if invalid."""
     try:
-        mol = Chem.MolFromSmiles(smiles)
+        mol = mol_from_smiles_quiet(smiles)
         if mol is None:
             return None
-        fp = AllChem.GetMorganFingerprintAsBitVect(mol, FP_RADIUS, nBits=FP_N_BITS)
+        with suppress_rdkit_logs():
+            fp = AllChem.GetMorganFingerprintAsBitVect(mol, FP_RADIUS, nBits=FP_N_BITS)
         return np.array(fp, dtype=np.uint8)
-    except (ValueError, RuntimeError, Chem.KekulizeException):
+    except (ValueError, RuntimeError):
         return None
 
 
