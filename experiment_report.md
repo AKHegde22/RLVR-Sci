@@ -9,14 +9,7 @@ This project implements **Reinforcement Learning from Verifiable Reward (RLVR)**
 
 The key innovation is a **fast surrogate verifier** (an MLP trained on QM9 data) that approximates expensive DFT quantum-chemistry calculations, making it feasible to run inside an RL training loop. The RL algorithm is **Group Relative Policy Optimization (GRPO)** via HuggingFace `trl`.
 
-```mermaid
-flowchart LR
-    A["QM9 Dataset<br/>133,885 molecules"] --> B["Surrogate MLP<br/>Morgan FP → Gap"]
-    B --> C["GRPO Reward Signals"]
-    C --> D["LLM Policy<br/>(LoRA fine-tuning)"]
-    D -->|generates SMILES| C
-    C -->|"5 reward functions"| D
-```
+![GRPO Architecture](flowchart.png)
 
 ### Reward Function Architecture
 
