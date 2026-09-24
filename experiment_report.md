@@ -1,8 +1,5 @@
 # RLVR-Sci Experiment Report
 
-**Volume:** `rlvr-sci-data` on Modal profile `akntemp30`
-**Date of Experiments:** August 31, 2026
-**Report Generated:** September 23, 2026
 
 ---
 
