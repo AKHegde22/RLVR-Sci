@@ -46,7 +46,7 @@ The key innovation is a **fast surrogate verifier** (an MLP trained on QM9 data)
 | Architecture | MLP (256, 128) with early stopping |
 | Model file | `surrogate_gap_model.joblib` (12.8 MiB) |
 
-> [!TIP]
+> **💡 TIP**
 > R² = 0.949 is excellent — the surrogate explains ~95% of the variance in HOMO-LUMO gap from fingerprints alone, far exceeding the 0.70 gate.
 
 ---
@@ -88,7 +88,7 @@ All three GRPO runs used identical LoRA adapters:
 | Completion length | — | 39.3 tokens |
 | Clip ratio | — | 0.0 |
 
-> [!NOTE]
+> **📝 NOTE**
 > The smoke test only ran 10 steps — too few for meaningful learning. Validity at −0.9 means 95% of outputs were invalid SMILES. This is expected for a 0.5B model with negligible training. The test verified pipeline correctness, not model quality.
 
 ---
@@ -122,7 +122,7 @@ All three GRPO runs used identical LoRA adapters:
 
 ![Reward Progression](xychart.png)
 
-> [!IMPORTANT]
+> **⚠️ IMPORTANT**
 > **Clear learning signal detected.** Over 60 steps:
 > - **Validity** flipped from −0.61 → **+0.11** (model learned to produce valid SMILES)
 > - **Surrogate gap** nearly quadrupled: 0.35 → **1.21** (model learned to optimize for higher HOMO-LUMO gap)
@@ -159,7 +159,7 @@ All three GRPO runs used identical LoRA adapters:
 
 ![Mistral Reward Progression](mistral_xychart.png)
 
-> [!IMPORTANT]
+> **⚠️ IMPORTANT**
 > **Mistral-7B learns faster than Qwen-0.5B.** Key observations:
 > - **Validity flipped positive by step 20** (+0.088 train, +0.45 eval) — the larger model already produces valid SMILES majority of the time after just 20 steps, vs ~50 steps for Qwen
 > - **Novelty is the strongest reward** at +0.606 eval — Mistral generates structurally distinct molecules far from QM9
@@ -183,5 +183,5 @@ All three GRPO runs used identical LoRA adapters:
 | Adapter size | 33.6 MiB | 160.1 MiB |
 | Completion length | 70.6 tokens | 117.6 tokens |
 
-> [!TIP]
+> **💡 TIP**
 > **Mistral-7B reaches higher overall reward in fewer steps** and excels at validity, novelty, and diversity. Qwen-0.5B excels at surrogate gap optimization (producing high-gap molecules). With more training steps, Mistral should learn to also optimize the surrogate gap — making it the clear candidate for the full 500-step production run.
