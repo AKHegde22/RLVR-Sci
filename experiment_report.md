@@ -198,5 +198,5 @@ All three GRPO runs used identical LoRA adapters:
 | Adapter size | 33.6 MiB | 160.1 MiB |
 | Completion length | 70.6 tokens | 117.6 tokens |
 
-> **💡 TIP**
+> **TIP:**
 > **Mistral-7B reaches higher overall reward in fewer steps** and excels at validity, novelty, and diversity. Qwen-0.5B excels at surrogate gap optimization (producing high-gap molecules). With more training steps, Mistral should learn to also optimize the surrogate gap, making it the clear candidate for the full 500-step production run.
