@@ -1,5 +1,18 @@
 # RLVR-Sci Experiment Report
 
+<style>
+table {
+  border-collapse: collapse;
+  width: 100%;
+}
+table, th, td {
+  border: 1.5px solid #000 !important;
+}
+th, td {
+  padding: 8px;
+}
+</style>
+
 ---
 
 ## 1. Research Overview
