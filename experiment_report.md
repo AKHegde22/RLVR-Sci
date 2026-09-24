@@ -19,7 +19,7 @@ th {
 
 ## 1. Research Overview
 
-This project implements **Reinforcement Learning from Verifiable Reward (RLVR)** for **scientific hypothesis generation**, specifically, teaching LLMs to generate novel chemical molecules (as SMILES strings) with targeted physical properties (HOMO-LUMO gap).
+This project implements **Reinforcement Learning from Verifiable Reward (RLVR)** for **scientific hypothesis generation** specifically, teaching LLMs to generate novel chemical molecules (as SMILES strings) with targeted physical properties (HOMO-LUMO gap).
 
 The key innovation is a **fast surrogate verifier** (an MLP trained on QM9 data) that approximates expensive DFT quantum-chemistry calculations, making it feasible to run inside an RL training loop. The RL algorithm is **Group Relative Policy Optimization (GRPO)** via HuggingFace `trl`.
 
