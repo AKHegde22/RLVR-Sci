@@ -19,7 +19,7 @@ th {
 
 ## 1. Research Overview
 
-This project implements **Reinforcement Learning from Verifiable Reward (RLVR)** for **scientific hypothesis generation** - specifically, teaching LLMs to generate novel chemical molecules (as SMILES strings) with targeted physical properties (HOMO-LUMO gap).
+This project implements **Reinforcement Learning from Verifiable Reward (RLVR)** for **scientific hypothesis generation**, specifically, teaching LLMs to generate novel chemical molecules (as SMILES strings) with targeted physical properties (HOMO-LUMO gap).
 
 The key innovation is a **fast surrogate verifier** (an MLP trained on QM9 data) that approximates expensive DFT quantum-chemistry calculations, making it feasible to run inside an RL training loop. The RL algorithm is **Group Relative Policy Optimization (GRPO)** via HuggingFace `trl`.
 
@@ -29,7 +29,7 @@ The key innovation is a **fast surrogate verifier** (an MLP trained on QM9 data)
 
 | # | Reward | Weight | Description |
 |---|--------|--------|-------------|
-| 1 | **Validity** | 1.0 | RDKit parse check - valid SMILES = +1.0, invalid = −1.0 |
+| 1 | **Validity** | 1.0 | RDKit parse check, valid SMILES = +1.0, invalid = −1.0 |
 | 2 | **Surrogate Gap** | 1.0 | Normalized predicted HOMO-LUMO gap from the MLP verifier |
 | 3 | **Novelty** | 0.5 | Penalizes Tanimoto similarity ≥ 0.85 to QM9 training molecules |
 | 4 | **Diversity** | 0.3 | Rewards structurally diverse completions within each prompt group |
@@ -62,7 +62,7 @@ The key innovation is a **fast surrogate verifier** (an MLP trained on QM9 data)
 | Model file | `surrogate_gap_model.joblib` (12.8 MiB) |
 
 > **TIP:**
-> R² = 0.949 is excellent - the surrogate explains ~95% of the variance in HOMO-LUMO gap from fingerprints alone, far exceeding the 0.70 gate.
+> R² = 0.949 is excellent, the surrogate explains ~95% of the variance in HOMO-LUMO gap from fingerprints alone, far exceeding the 0.70 gate.
 
 ---
 
@@ -86,29 +86,29 @@ All three GRPO runs used identical LoRA adapters:
 
 ## 4. Training Results
 
-### 4.1 Smoke Test - Qwen2.5-0.5B-Instruct (10 steps)
+### 4.1 Smoke Test, Qwen2.5-0.5B-Instruct (10 steps)
 
 **Config:** 50 prompts · 10 steps · batch=4 · 4-bit NF4 · L4 GPU
 
 | Metric | Step 10 (train) | Step 10 (eval) |
 |--------|-----------------|----------------|
-| **Total Reward** | - | **−0.777** |
-| Reward std | - | 0.447 |
+| **Total Reward** | N/A | **−0.777** |
+| Reward std | N/A | 0.447 |
 | Loss | −0.066 | −0.011 |
-| Validity | - | **−0.900** |
-| Surrogate gap | - | **+0.108** |
-| Novelty | - | **−0.050** |
-| Diversity | - | **+0.050** |
-| Conditional gap | - | NaN (skipped) |
-| Completion length | - | 39.3 tokens |
-| Clip ratio | - | 0.0 |
+| Validity | N/A | **−0.900** |
+| Surrogate gap | N/A | **+0.108** |
+| Novelty | N/A | **−0.050** |
+| Diversity | N/A | **+0.050** |
+| Conditional gap | N/A | NaN (skipped) |
+| Completion length | N/A | 39.3 tokens |
+| Clip ratio | N/A | 0.0 |
 
 > **NOTE:**
-> The smoke test only ran 10 steps - too few for meaningful learning. Validity at −0.9 means 95% of outputs were invalid SMILES. This is expected for a 0.5B model with negligible training. The test verified pipeline correctness, not model quality.
+> The smoke test only ran 10 steps, too few for meaningful learning. Validity at −0.9 means 95% of outputs were invalid SMILES. This is expected for a 0.5B model with negligible training. The test verified pipeline correctness, not model quality.
 
 ---
 
-### 4.2 Integration Test - Qwen2.5-0.5B-Instruct (60 steps)
+### 4.2 Integration Test, Qwen2.5-0.5B-Instruct (60 steps)
 
 **Config:** 180 prompts · 60 steps · batch=4 · 4-bit NF4 · L4 GPU
 
@@ -143,11 +143,11 @@ All three GRPO runs used identical LoRA adapters:
 > - **Surrogate gap** nearly quadrupled: 0.35 → **1.21** (model learned to optimize for higher HOMO-LUMO gap)
 > - **Novelty** improved steadily: 0.10 → **0.40** (model generates increasingly novel molecules)
 > - **Total reward** grew monotonically from −0.17 → **+1.71**
-> - Gradient norm peaked at step 40 (9.77) then stabilized at 6.03 - healthy training dynamics
+> - Gradient norm peaked at step 40 (9.77) then stabilized at 6.03, healthy training dynamics
 
 ---
 
-### 4.3 Integration Test - Mistral-7B-Instruct-v0.2 (25 steps)
+### 4.3 Integration Test, Mistral-7B-Instruct-v0.2 (25 steps)
 
 **Config:** 100 prompts · 25 steps · batch=4 · 4-bit NF4 · L4 GPU · 24 GiB memory
 
@@ -176,12 +176,12 @@ All three GRPO runs used identical LoRA adapters:
 
 > **IMPORTANT:**
 > **Mistral-7B learns faster than Qwen-0.5B.** Key observations:
-> - **Validity flipped positive by step 20** (+0.088 train, +0.45 eval) - the larger model already produces valid SMILES majority of the time after just 20 steps, vs ~50 steps for Qwen
-> - **Novelty is the strongest reward** at +0.606 eval - Mistral generates structurally distinct molecules far from QM9
-> - **Diversity is high** at +0.384 eval - within-group molecular variety
-> - **Surrogate gap is low** (+0.061 eval) - the model optimizes for novelty/validity rather than high HOMO-LUMO gap at this early stage. This is expected: the model first learns to output valid, novel SMILES before learning to maximize the specific property
-> - **Longer completions** (117.6 tokens vs 70.6 for Qwen) - Mistral generates more verbose outputs with richer molecular descriptions
-> - **Gradient norms are lower** (1.8–2.6 vs 2.4–9.8 for Qwen) - more stable optimization in the larger model
+> - **Validity flipped positive by step 20** (+0.088 train, +0.45 eval), the larger model already produces valid SMILES majority of the time after just 20 steps, vs ~50 steps for Qwen
+> - **Novelty is the strongest reward** at +0.606 eval, Mistral generates structurally distinct molecules far from QM9
+> - **Diversity is high** at +0.384 eval, within-group molecular variety
+> - **Surrogate gap is low** (+0.061 eval), the model optimizes for novelty/validity rather than high HOMO-LUMO gap at this early stage. This is expected: the model first learns to output valid, novel SMILES before learning to maximize the specific property
+> - **Longer completions** (117.6 tokens vs 70.6 for Qwen), Mistral generates more verbose outputs with richer molecular descriptions
+> - **Gradient norms are lower** (1.8–2.6 vs 2.4–9.8 for Qwen), more stable optimization in the larger model
 
 ---
 
@@ -199,4 +199,4 @@ All three GRPO runs used identical LoRA adapters:
 | Completion length | 70.6 tokens | 117.6 tokens |
 
 > **💡 TIP**
-> **Mistral-7B reaches higher overall reward in fewer steps** and excels at validity, novelty, and diversity. Qwen-0.5B excels at surrogate gap optimization (producing high-gap molecules). With more training steps, Mistral should learn to also optimize the surrogate gap - making it the clear candidate for the full 500-step production run.
+> **Mistral-7B reaches higher overall reward in fewer steps** and excels at validity, novelty, and diversity. Qwen-0.5B excels at surrogate gap optimization (producing high-gap molecules). With more training steps, Mistral should learn to also optimize the surrogate gap, making it the clear candidate for the full 500-step production run.
