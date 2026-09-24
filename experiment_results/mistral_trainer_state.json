@@ -1,0 +1,85 @@
+{
+  "best_metric": null,
+  "best_model_checkpoint": null,
+  "epoch": 1.1333333333333333,
+  "eval_steps": 25,
+  "global_step": 25,
+  "is_hyper_param_search": false,
+  "is_local_process_zero": true,
+  "is_world_process_zero": true,
+  "log_history": [
+    {
+      "clip_ratio": 0.0,
+      "completion_length": 91.175,
+      "epoch": 0.4444444444444444,
+      "grad_norm": 1.8074191808700562,
+      "learning_rate": 6e-06,
+      "loss": -0.0093,
+      "num_tokens": 23924.0,
+      "reward": 0.05148051381111145,
+      "reward_std": 0.6930908451788127,
+      "rewards/conditional_gap_reward_func": NaN,
+      "rewards/diversity_reward_func": 0.1375,
+      "rewards/novelty_reward_func": 0.22026257514953612,
+      "rewards/surrogate_reward_func": 0.30702616572380065,
+      "rewards/validity_reward_func": -0.4375,
+      "step": 10
+    },
+    {
+      "clip_ratio": 0.0,
+      "completion_length": 111.68125,
+      "epoch": 0.8888888888888888,
+      "grad_norm": 2.6384968757629395,
+      "learning_rate": 2.0000000000000003e-06,
+      "loss": -0.0043,
+      "num_tokens": 51301.0,
+      "reward": 0.5362528808414936,
+      "reward_std": 1.299253356643021,
+      "rewards/conditional_gap_reward_func": NaN,
+      "rewards/diversity_reward_func": 0.33160048723220825,
+      "rewards/novelty_reward_func": 0.4291335932910442,
+      "rewards/surrogate_reward_func": 0.016403458267450332,
+      "rewards/validity_reward_func": 0.0875,
+      "step": 20
+    },
+    {
+      "epoch": 1.1333333333333333,
+      "eval_clip_ratio": 0.0,
+      "eval_completion_length": 117.6,
+      "eval_loss": -0.024921761825680733,
+      "eval_num_tokens": 65117.0,
+      "eval_reward": 1.0586628198623658,
+      "eval_reward_std": 1.4422010317444802,
+      "eval_rewards/conditional_gap_reward_func": NaN,
+      "eval_rewards/diversity_reward_func": 0.3841591954231262,
+      "eval_rewards/novelty_reward_func": 0.6059481173753738,
+      "eval_rewards/surrogate_reward_func": 0.06104117035865784,
+      "eval_rewards/validity_reward_func": 0.45,
+      "eval_runtime": 505.5216,
+      "eval_samples_per_second": 0.02,
+      "eval_steps_per_second": 0.006,
+      "step": 25
+    }
+  ],
+  "logging_steps": 10,
+  "max_steps": 25,
+  "num_input_tokens_seen": 0,
+  "num_train_epochs": 2,
+  "save_steps": 25,
+  "stateful_callbacks": {
+    "TrainerControl": {
+      "args": {
+        "should_epoch_stop": false,
+        "should_evaluate": false,
+        "should_log": false,
+        "should_save": true,
+        "should_training_stop": true
+      },
+      "attributes": {}
+    }
+  },
+  "total_flos": 0.0,
+  "train_batch_size": 4,
+  "trial_name": null,
+  "trial_params": null
+}

@@ -1,0 +1,14 @@
+{
+  "status": "trained",
+  "r2": 0.9487630660562091,
+  "mse": 0.00011679644173637453,
+  "gap_mean": 0.25110037121410167,
+  "gap_std": 0.04751871040867132,
+  "gap_min": 0.0246,
+  "gap_max": 0.6221,
+  "min_r2_threshold": 0.7,
+  "fp_radius": 2,
+  "fp_n_bits": 2048,
+  "random_state": 42,
+  "train_rows": 133885
+}

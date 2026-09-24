@@ -1,0 +1,20 @@
+{
+  "status": "created",
+  "source_url": "https://deepchemdata.s3-us-west-1.amazonaws.com/datasets/qm9.csv",
+  "source_rows": 133885,
+  "num_molecules": 133885,
+  "fingerprint_rows": 133885,
+  "fingerprint_shape": [
+    133885,
+    2048
+  ],
+  "invalid_fingerprint_rows": 0,
+  "gap_min": 0.0246,
+  "gap_max": 0.6221,
+  "gap_mean": 0.25110037121410167,
+  "gap_std": 0.047518887870584905,
+  "csv_path": "/vol/data/qm9_processed.csv",
+  "fingerprints_path": "/vol/data/qm9_fingerprints.npy",
+  "manifest_path": "/vol/data/dataset_manifest.json",
+  "updated_at": "2026-08-31T12:14:04.914791+00:00"
+}
