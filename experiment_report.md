@@ -155,6 +155,10 @@ All three GRPO runs used identical LoRA adapters:
 | Eval Completion Length | 117.6 tokens |
 | Eval Runtime | 505.5s |
 
+#### Trend Analysis
+
+![Mistral Reward Progression](mistral_xychart.png)
+
 > [!IMPORTANT]
 > **Mistral-7B learns faster than Qwen-0.5B.** Key observations:
 > - **Validity flipped positive by step 20** (+0.088 train, +0.45 eval) — the larger model already produces valid SMILES majority of the time after just 20 steps, vs ~50 steps for Qwen
