@@ -1,0 +1,6 @@
+flowchart LR
+    A["QM9 Dataset<br/>133,885 molecules"] --> B["Surrogate MLP<br/>Morgan FP → Gap"]
+    B --> C["GRPO Reward Signals"]
+    C --> D["LLM Policy<br/>(LoRA fine-tuning)"]
+    D -->|generates SMILES| C
+    C -->|"5 reward functions"| D

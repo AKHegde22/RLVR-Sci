@@ -1,6 +1,5 @@
 # RLVR-Sci Experiment Report
 
-
 ---
 
 ## 1. Research Overview
@@ -121,15 +120,7 @@ All three GRPO runs used identical LoRA adapters:
 
 #### Trend Analysis
 
-```mermaid
-xychart-beta
-    title "Qwen 0.5B — Reward Progression (60 steps)"
-    x-axis "Step" [10, 20, 30, 40, 60]
-    y-axis "Score" -1 --> 2
-    line "Total Reward" [-0.17, 0.008, 0.466, 0.955, 1.714]
-    line "Validity" [-0.613, -0.525, -0.375, -0.163, 0.113]
-    line "Surrogate" [0.346, 0.396, 0.665, 0.858, 1.213]
-```
+![Reward Progression](xychart.png)
 
 > [!IMPORTANT]
 > **Clear learning signal detected.** Over 60 steps:
