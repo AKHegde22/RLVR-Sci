@@ -5,11 +5,13 @@ table {
   border-collapse: collapse;
   width: 100%;
 }
-table, th, td {
-  border: 1.5px solid #000 !important;
-}
 th, td {
-  padding: 8px;
+  border: 1px solid #999 !important;
+  padding: 8px 12px;
+}
+th {
+  background-color: #f6f8fa;
+  border-bottom: 2px solid #555 !important;
 }
 </style>
 
